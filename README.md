@@ -13,7 +13,7 @@ Consulte a documentação completa:
 - `data/`: Dataset bruto (ignorado pelo git).
 - `models/`: Artefatos locais (preprocessor e pesos da rede neural pytorch).
 - `notebooks/`: Análise exploratória (EDA) e treinamento de baselines (Scikit-Learn).
-- `src/`: Core do projeto refatorado (arquitetura `mlp.py`, treinamento `train.py` e API `main.py`).
+- `src/`: Core do projeto escalável e modular contendo os pacotes `api`, `training` e `models`.
 - `tests/`: Bateria de testes usando Pytest (Smoke test, schema validation c/ Pydantic).
 - `docs/`: Arquivos complementares de MLOps.
 
@@ -38,7 +38,7 @@ O script a seguir baixará via `kagglehub` e copiará para a pasta local automá
 ### 3. Execução do Treinamento
 Para treinar o modelo do zero, visualizar o early-stopping e coletar novas métricas no MLflow:
 ```bash
-python src/train.py
+python -m src.training.run
 ```
 
 ### 4. Rodando A API (Inferência em Produção)
