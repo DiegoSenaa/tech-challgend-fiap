@@ -1,7 +1,10 @@
 .PHONY: test lint run setup
 
 setup:
-	venv/bin/pip install -e ".[dev]"
+	venv/bin/pip install -e ".[dev,train,eda]"
+
+setup-prod:
+	venv/bin/pip install .
 
 test:
 	venv/bin/pytest tests/ -v
