@@ -1,5 +1,8 @@
 import os
+import logging
 import random
+
+logger = logging.getLogger(__name__)
 
 import mlflow
 import numpy as np
@@ -49,7 +52,7 @@ def run_training_pipeline():
     mlflow.set_tracking_uri("sqlite:///mlruns.db")
     mlflow.set_experiment("Telco_Churn_PyTorch")
 
-    print("\n--- Treinando Baseline (Logistic Regression) ---")
+    logger.info("--- Treinando Baseline (Logistic Regression) ---")
     with mlflow.start_run(run_name="Baseline_LogisticRegression"):
         lr_model = LogisticRegression(random_state=42, max_iter=1000)
         lr_model.fit(X_train.numpy(), y_train.squeeze().numpy())
@@ -67,7 +70,7 @@ def run_training_pipeline():
         mlflow.log_metrics({f"baseline_{k}": v for k, v in lr_metrics.items()})
         mlflow.sklearn.log_model(lr_model, "baseline_model")
         for k, v in lr_metrics.items():
-            print(f" - [Baseline] {k}: {v:.4f}")
+            logger.info(" - [Baseline] %s: %.4f", k, v)
 
     epochs = 150
     patience = 20
@@ -77,7 +80,7 @@ def run_training_pipeline():
     with mlflow.start_run(run_name="MLP_Early_Stopping"):
         mlflow.log_params({"batch_size": batch_size, "hidden_layers": [64, 32], "dropout": 0.3, "lr": 0.001, "pos_weight": float(pos_weight.item()), "patience": patience})
 
-        print("Treinando Rede Neural com Early Stopping...")
+        logger.info("Treinando Rede Neural com Early Stopping...")
         for epoch in range(epochs):
             model.train()
             train_loss = 0.0
@@ -111,13 +114,13 @@ def run_training_pipeline():
             else:
                 counter += 1
                 if counter >= patience:
-                    print(f"-> Early stopping acionado na época {epoch+1}. Melhor loss: {best_val_loss:.4f}")
+                    logger.info("-> Early stopping acionado na época %d. Melhor loss: %.4f", epoch+1, best_val_loss)
                     break
 
         mlflow.log_metric("best_val_loss", best_val_loss)
 
         # 3. Avaliação no Conjunto de Teste
-        print("Avaliando melhor modelo no Dataset de Testes (dados nunca vistos)...")
+        logger.info("Avaliando melhor modelo no Dataset de Testes (dados nunca vistos)...")
         model.load_state_dict(torch.load("models/best_mlp.pth", map_location='cpu'))
         model.eval()
         with torch.no_grad():
@@ -134,17 +137,17 @@ def run_training_pipeline():
         }
         mlflow.log_metrics(metrics)
         for k, v in metrics.items():
-            print(f" - {k}: {v:.4f}")
+            logger.info(" - %s: %.4f", k, v)
 
         # Análise Custo/Matriz de Confusão
         cm = confusion_matrix(y_test_true, preds)
         tn, fp, fn, tp = cm.ravel()
-        print("\nMatriz de Confusão (Trade-off de Negócio):")
-        print(f" TN (Ficaram/Acertamos): {tn}")
-        print(f" FP (Ficaram/Oferecemos desconto atoa): {fp} -> Custo Moderado")
-        print(f" FN (Cancelaram/Não identificamos): {fn} -> Custo Alto (Pior cenário)")
-        print(f" TP (Cancelariam/Ação de Retenção): {tp}")
+        logger.info("Matriz de Confusão (Trade-off de Negócio):")
+        logger.info(" TN (Ficaram/Acertamos): %d", tn)
+        logger.info(" FP (Ficaram/Oferecemos desconto atoa): %d -> Custo Moderado", fp)
+        logger.info(" FN (Cancelaram/Não identificamos): %d -> Custo Alto (Pior cenário)", fn)
+        logger.info(" TP (Cancelariam/Ação de Retenção): %d", tp)
 
         # Salvando a arquitetura completa do Pytorch no MLflow
         mlflow.pytorch.log_model(model, "model")
-        print("Modelo registrado com sucesso no MLflow.")
+        logger.info("Modelo registrado com sucesso no MLflow.")
