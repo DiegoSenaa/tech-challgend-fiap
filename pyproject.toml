@@ -42,7 +42,8 @@ eda = [
 dev = [
     "pytest>=7.4.0",
     "httpx>=0.24.0",
-    "ruff>=0.1.0"
+    "ruff>=0.1.0",
+    "pandera>=0.16.0"
 ]
 
 [tool.ruff]
