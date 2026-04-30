@@ -1,14 +1,14 @@
 import pytest
-import pandera as pa
+import pandera.pandas as pa
 import pandas as pd
-from pandera import Column, DataFrameSchema, Check
+from pandera import Check
 
 # Definindo o Schema Esperado para Telecom Churn (Simplificado)
-churn_schema = DataFrameSchema({
-    "tenure": Column(int, Check.ge(0), nullable=False),
-    "monthlycharges": Column(float, Check.ge(0.0), nullable=False),
-    "totalcharges": Column(float, Check.ge(0.0), nullable=True),
-    "churn_label": Column(str, Check.isin(["Yes", "No"]), nullable=False)
+churn_schema = pa.DataFrameSchema({
+    "tenure": pa.Column(int, Check.ge(0), nullable=False),
+    "monthlycharges": pa.Column(float, Check.ge(0.0), nullable=False),
+    "totalcharges": pa.Column(float, Check.ge(0.0), nullable=True),
+    "churn_label": pa.Column(str, Check.isin(["Yes", "No"]), nullable=False)
 })
 
 def test_raw_data_schema():

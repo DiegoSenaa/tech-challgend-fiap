@@ -22,14 +22,21 @@ Consulte a documentação completa:
 ### 1. Setup do Ambiente
 Este projeto usa `pyproject.toml` como Single Source of Truth para as dependências. Requer Python 3.9+.
 
+**Para Linux / macOS:**
 ```bash
-# Criar ambiente virtual
 python3 -m venv venv
 source venv/bin/activate
-
-# Instalar dependências pelo Makefile
-make setup
+make setup  # Ou rodar: pip install -e ".[dev,train,eda]"
 ```
+
+**Para Windows:**
+```powershell
+python -m venv venv
+.\venv\Scripts\activate
+pip install -e ".[dev,train,eda]"
+```
+> **Nota (Erro de Permissão no PowerShell):** Se você receber o erro de "execução de scripts desabilitada" ao tentar rodar o comando de `activate`, rode o seguinte comando no PowerShell para dar permissão apenas para o seu usuário:
+> `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
 
 ### 2. Baixar o Banco de Dados
 O script a seguir baixará via `kagglehub` e copiará para a pasta local automática (Você já deve possuir as credenciais locais no ambiente e rodado o script original da modelagem):
@@ -44,20 +51,31 @@ python -m src.training.run
 ### 4. Rodando A API (Inferência em Produção)
 Para iniciar o servidor FastAPI:
 ```bash
-make run
-# Ou acesse via uvicorn src.api.main:app --reload
+uvicorn src.api.main:app --reload
+# (Se tiver o Make instalado, pode usar: make run)
 ```
 Acesse o portal do Swagger / Docs em: `http://localhost:8000/docs`
 
 ### 5. Checagem de Qualidade (Testes e Lint)
-Garantindo que o código não perca formato:
+Garantindo que o código não perca formato e validando regras de negócio:
 ```bash
-make test
-make lint
+pytest tests/ -v
+ruff check .
+```
+
+### 6. Rodando com Docker (Deploy)
+A API foi dockerizada para facilitar o deploy em produção. Com os artefatos de modelo gerados (passo 3), basta buildar e rodar o contêiner:
+```bash
+# Faz o build da imagem
+docker build -t telco-churn-api .
+
+# Executa o contêiner mapeando a porta 8000
+docker run -p 8000:8000 telco-churn-api
 ```
 
 ## Tracking no MLflow
 Para visualizar as experimentações anteriores e o tracking dos modelos Baseline (Dummy vs Regressão Logística) contra nossa poderosa MLP PyTorch, rode:
 ```bash
-make mlflow
+mlflow ui
+# (Se tiver o Make instalado, pode usar: make mlflow)
 ```
