@@ -1,7 +1,6 @@
-import os
-from pathlib import Path
 import logging
 import random
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -61,10 +60,10 @@ def run_training_pipeline():
     with mlflow.start_run(run_name="Baseline_LogisticRegression"):
         lr_model = LogisticRegression(random_state=42, max_iter=1000)
         lr_model.fit(X_train.numpy(), y_train.squeeze().numpy())
-        
+
         lr_preds = lr_model.predict(X_test.numpy())
         lr_probs = lr_model.predict_proba(X_test.numpy())[:, 1]
-        
+
         lr_metrics = {
             "test_accuracy": accuracy_score(y_test_true, lr_preds),
             "test_precision": precision_score(y_test_true, lr_preds, zero_division=0),

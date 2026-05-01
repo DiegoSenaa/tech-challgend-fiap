@@ -7,7 +7,7 @@ class CustomerData(BaseModel):
     monthly_charges: float = Field(..., description="Cobrança mensal em dólares")
     contract: str = Field(..., description="Month-to-month, One year, Two year")
     internet_service: str = Field(..., description="DSL, Fiber optic, No")
-    
+
     # Campos Secundários (Optativos com valores padrão para simplificação)
     gender: str = Field(default="Female", description="Male ou Female")
     senior_citizen: str = Field(default="0", description="0 (No) ou 1 (Yes)")
