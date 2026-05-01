@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 
@@ -59,7 +58,7 @@ class InferenceService:
         # 4. Resultado pós-modelo
         prediction = 1 if prob >= 0.5 else 0
         msg = "Alto risco de Churn!" if prediction == 1 else "Cliente estável."
-        
+
         return {
             "churn_probability": prob,
             "churn_prediction": prediction,
