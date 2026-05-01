@@ -30,12 +30,21 @@ models/
 !models/.keep
 mlruns/
 mlruns.db
+mlflow.db
 *.pkl
 *.pth
 *.pt
 *.h5
 *.hdf5
 *.onnx
+
+# Global extensions for large datasets
+*.csv
+*.xlsx
+*.parquet
+*.feather
+*.zip
+*.tar.gz
 
 # Testing and Linters
 .pytest_cache/

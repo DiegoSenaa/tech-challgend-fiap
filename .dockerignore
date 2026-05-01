@@ -1,0 +1,19 @@
+.git
+.gitignore
+venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.egg-info
+
+# Arquivos locais e bases de dados
+mlruns.db
+mlflow.db
+data/
+
+# Documentação, Testes e Notebooks não precisam ir pro container de API
+docs/
+notebooks/
+tests/
+Makefile
+README.md

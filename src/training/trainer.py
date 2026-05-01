@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import logging
 import random
 
@@ -33,6 +34,10 @@ def set_seeds(seed=42):
 
 def run_training_pipeline():
     """ Orquestra a injeção dos dados, treinamento Baseline e da Rede Neural """
+    root_dir = Path(__file__).resolve().parent.parent.parent
+    models_dir = root_dir / "models"
+    models_dir.mkdir(exist_ok=True)
+
     set_seeds(42)  # Garantindo reprodutibilidade na inicialização
     (X_train, y_train), (X_val, y_val), (X_test, y_test_t, y_test_true), input_dim = load_and_preprocess_data()
 
@@ -110,7 +115,7 @@ def run_training_pipeline():
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
                 counter = 0
-                torch.save(model.state_dict(), "models/best_mlp.pth")
+                torch.save(model.state_dict(), models_dir / "best_mlp.pth")
             else:
                 counter += 1
                 if counter >= patience:
@@ -121,7 +126,7 @@ def run_training_pipeline():
 
         # 3. Avaliação no Conjunto de Teste
         logger.info("Avaliando melhor modelo no Dataset de Testes (dados nunca vistos)...")
-        model.load_state_dict(torch.load("models/best_mlp.pth", map_location='cpu'))
+        model.load_state_dict(torch.load(models_dir / "best_mlp.pth", map_location='cpu'))
         model.eval()
         with torch.no_grad():
             logits = model(X_test)
