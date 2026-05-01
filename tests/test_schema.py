@@ -1,6 +1,6 @@
-import pytest
-import pandera.pandas as pa
 import pandas as pd
+import pandera.pandas as pa
+import pytest
 from pandera import Check
 
 # Definindo o Schema Esperado para Telecom Churn (Simplificado)
@@ -23,7 +23,7 @@ def test_raw_data_schema():
         "totalcharges": [29.85, 1889.5, 108.15, 1840.75],
         "churn_label": ["No", "No", "Yes", "No"]
     }
-    
+
     df = pd.DataFrame(data)
 
     try:
@@ -40,8 +40,8 @@ def test_invalid_schema_data_types():
         "totalcharges": [29.85, 1889.5],
         "churn_label": ["Maybe", "No"] # Maybe não está na lista de aceitos
     }
-    
+
     df = pd.DataFrame(invalid_data)
-    
+
     with pytest.raises(pa.errors.SchemaError):
         churn_schema.validate(df)
