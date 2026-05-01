@@ -1,12 +1,16 @@
 import os
 import sys
+from pathlib import Path
 
 import joblib
 import pandas as pd
 import torch
 
-# Ajuste de path para alcançar o modelo
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+# Ajuste de path para alcançar a raiz do projeto (para os imports de src.* funcionarem corretamente)
+root_dir = Path(__file__).resolve().parent.parent.parent.parent
+if str(root_dir) not in sys.path:
+    sys.path.append(str(root_dir))
+
 from src.models.mlp import ChurnMLP
 
 
@@ -18,13 +22,14 @@ class InferenceService:
 
     def load_artifacts(self):
         """ Carrega o MinMaxScaler/OHE e a Rede Neural na inicialização da aplicação """
-        preprocessor_path = "models/preprocessor.pkl"
-        if os.path.exists(preprocessor_path):
+        models_dir = root_dir / "models"
+        preprocessor_path = models_dir / "preprocessor.pkl"
+        if preprocessor_path.exists():
             self.preprocessor = joblib.load(preprocessor_path)
 
-        model_path = "models/best_mlp.pth"
-        feature_names_path = "models/feature_names.pkl"
-        if os.path.exists(model_path) and os.path.exists(feature_names_path):
+        model_path = models_dir / "best_mlp.pth"
+        feature_names_path = models_dir / "feature_names.pkl"
+        if model_path.exists() and feature_names_path.exists():
             input_dim = len(joblib.load(feature_names_path))
             self.model = ChurnMLP(input_dim=input_dim, hidden_layers=[64, 32], dropout_rate=0) # inferência no dropout
             self.model.load_state_dict(torch.load(model_path, map_location='cpu'))

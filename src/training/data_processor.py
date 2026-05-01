@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import logging
 import joblib
 import pandas as pd
@@ -13,7 +14,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 def load_and_preprocess_data():
     """ Carrega os bancos de dados, higieniza as features, realiza Split e aplica Feature Engineering """
     logger.info("Iniciando pré-processamento para a Rede Neural PyTorch...")
-    df = pd.read_excel("data/Telco_customer_churn.xlsx")
+    root_dir = Path(__file__).resolve().parent.parent.parent
+    data_path = root_dir / "data" / "Telco_customer_churn.xlsx"
+    df = pd.read_excel(data_path)
     df.columns = df.columns.str.lower().str.replace(" ", "_")
     df["total_charges"] = pd.to_numeric(df["total_charges"], errors='coerce')
     df = df.dropna(subset=['total_charges'])
@@ -46,13 +49,14 @@ def load_and_preprocess_data():
     X_test_trans = preprocessor.transform(X_test)
 
     # Salvando preprocessor para uso na inferência / API
-    os.makedirs("models", exist_ok=True)
-    joblib.dump(preprocessor, "models/preprocessor.pkl")
+    models_dir = root_dir / "models"
+    models_dir.mkdir(exist_ok=True)
+    joblib.dump(preprocessor, models_dir / "preprocessor.pkl")
 
     # Pegando a assinatura (nomes das colunas com one-hot)
     cat_feature_names = preprocessor.named_transformers_['cat'].get_feature_names_out(cat_cols)
     all_feature_names = num_cols + cat_feature_names.tolist()
-    joblib.dump(all_feature_names, "models/feature_names.pkl")
+    joblib.dump(all_feature_names, models_dir / "feature_names.pkl")
 
     X_train_t = torch.FloatTensor(X_train_trans)
     y_train_t = torch.FloatTensor(y_train).view(-1, 1)
