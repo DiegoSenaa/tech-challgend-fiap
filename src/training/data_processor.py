@@ -1,4 +1,5 @@
 import os
+import logging
 import joblib
 import pandas as pd
 import torch
@@ -6,9 +7,12 @@ from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
 def load_and_preprocess_data():
     """ Carrega os bancos de dados, higieniza as features, realiza Split e aplica Feature Engineering """
-    print("Iniciando pré-processamento para a Rede Neural PyTorch...")
+    logger.info("Iniciando pré-processamento para a Rede Neural PyTorch...")
     df = pd.read_excel("data/Telco_customer_churn.xlsx")
     df.columns = df.columns.str.lower().str.replace(" ", "_")
     df["total_charges"] = pd.to_numeric(df["total_charges"], errors='coerce')
