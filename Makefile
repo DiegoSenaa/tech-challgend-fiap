@@ -16,4 +16,4 @@ run:
 	uvicorn src.api.main:app --reload
 
 mlflow:
-	mlflow ui
+	mlflow ui --backend-store-uri sqlite:///mlruns.db --workers 1

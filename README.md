@@ -76,6 +76,6 @@ docker run -p 8000:8000 telco-churn-api
 ## Tracking no MLflow
 Para visualizar as experimentações anteriores e o tracking dos modelos Baseline (Dummy vs Regressão Logística) contra nossa poderosa MLP PyTorch, rode:
 ```bash
-mlflow ui
+mlflow ui --backend-store-uri sqlite:///mlruns.db --workers 1
 # (Se tiver o Make instalado, pode usar: make mlflow)
 ```
